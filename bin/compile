@@ -237,3 +237,10 @@ if [ -n "$BUILDPACK_CLEAR_CACHE" ]; then
   echo "-----> Clearing cache dir."
   rm -rf $METEOR_DIR
 fi
+
+#
+# Remove unnecessary stuff to reduce the overall size of the repo to get under the 500MB (compressed) "slug" limit
+#
+rm -rf "$APP_CHECKOUT_DIR"/node_modules
+rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
+
