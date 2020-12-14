@@ -121,24 +121,13 @@ cd "$APP_SOURCE_DIR"
 METEOR_VERSION=`METEOR --version`
 
 echo "-----> Target Meteor version: $METEOR_VERSION"
-
-echo "METEOR_DIR=$METEOR_DIR"
-echo "0 ------"
-echo `ls -R $METEOR_DIR`
-echo "1 ------"
-echo `ls $METEOR_DIR/.meteor/packages/meteor-tool`
-echo "2 ------"
-echo `ls $METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION`
-echo "3 ------"
-echo `ls $METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/*x86*`
-echo "4 ------"
-echo `ls $METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/*x86*/tools/project-context.js`
+echo `ls -la $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js`
 echo "sed start ------"
-sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' $METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/*x86*/tools/project-context.js` > new-project-context.js
+sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js` > new-project-context.js
 echo "sed stops ------"
 cat new-project-context.js
 echo "end of changed file ------"
-mv new-project-context.js $METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/*x86*/tools/project-context.js
+mv new-project-context.js $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js
 
 # Deal with non-server build targets.  Determine if we have --server-only flag
 # capability (Meteor 1.3 and up).
