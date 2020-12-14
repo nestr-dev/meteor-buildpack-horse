@@ -123,6 +123,8 @@ METEOR_VERSION=`METEOR --version`
 echo "-----> Target Meteor version: $METEOR_VERSION"
 
 echo "METEOR_DIR=$METEOR_DIR"
+echo "0 ------"
+echo `ls -R $METEOR_DIR`
 echo "1 ------"
 echo `ls $METEOR_DIR/.meteor/packages/meteor-tool`
 echo "2 ------"
