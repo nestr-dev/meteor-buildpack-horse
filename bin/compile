@@ -123,7 +123,7 @@ METEOR_VERSION=`METEOR --version`
 echo "-----> Target Meteor version: $METEOR_VERSION"
 echo `ls -la $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js`
 echo "sed start ------"
-sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js` > new-project-context.js
+sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' $METEOR_DIR/.meteor/packages/meteor-tool/*/*x86*/tools/project-context.js > new-project-context.js
 echo "sed stops ------"
 cat new-project-context.js
 echo "end of changed file ------"
