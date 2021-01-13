@@ -125,13 +125,14 @@ METEOR_VERSION="1.12.1"
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
 METEOR_PROJECT_CONTEXT_FILE_NAME="project-context.js"
-# echo `ls -la $METEOR_TOOLS_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME`
-# echo "sed start ------"
+echo `ls -la $METEOR_TOOLS_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME`
+echo "sed start ------"
 # hack to completely remove building the web.browser.legacy 'web architecture', which takes 10+ minutes off the deployment time
 sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' "$METEOR_TOOLS_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME" > "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME"
-# echo "sed stops ------"
-# cat project-context.js
-# echo "end of changed file ------"
+echo "sed stops ------"
+cat project-context.js
+echo "end of changed file ------"
+echo "moving file from $METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME to $METEOR_TOOLS_DIR/."
 mv "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME" "$METEOR_TOOLS_DIR/."
 
 # Deal with non-server build targets.  Determine if we have --server-only flag
