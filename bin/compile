@@ -118,9 +118,9 @@ function METEOR {
 # than the "latest" that is installed by install.meteor.com.
 cd "$APP_SOURCE_DIR"
 
-#METEOR_VERSION=`METEOR --version`
+METEOR_VERSION=`METEOR --version`
 # Workaround: 1.12.1 reports as "1.12" for some strange reason
-METEOR_VERSION="1.12.1"
+#METEOR_VERSION="1.12.1"
 
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
