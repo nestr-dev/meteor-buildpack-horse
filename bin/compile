@@ -120,8 +120,8 @@ cd "$APP_SOURCE_DIR"
 
 #METEOR_VERSION=`METEOR --version`
 # Workaround: 1.12.1 reports as "1.12" for some strange reason
-# Workaround: 2.0.0 reports as "2.0" for some strange reason
-METEOR_VERSION="2.0.0"
+# Workaround: 2.1.0 reports as "2.1" for some strange reason
+METEOR_VERSION="2.1.0"
 
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
