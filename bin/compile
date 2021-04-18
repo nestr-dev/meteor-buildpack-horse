@@ -37,10 +37,10 @@ BUILDPACK_DIR=$(cd -P -- "$(dirname -- "$0")" && cd .. && pwd -P)
 # Get the directory our app is checked out in (the "BUILD_DIR"), passed by Heroku
 APP_CHECKOUT_DIR=$1
 CACHE_DIR=$2
-if [ -n "$BUILDPACK_CLEAR_CACHE" ]; then
-  echo "-----> Clearing cache dir."
-  rm -rf "$CACHE_DIR/*"
-fi
+#if [ -n "$BUILDPACK_CLEAR_CACHE" ]; then
+#  echo "-----> Clearing cache dir."
+#  rm -rf "$CACHE_DIR/*"
+#fi
 
 #
 # Find the meteor app ($APP_SOURCE_DIR).
@@ -249,17 +249,17 @@ done
 #
 # Clear cache after build is done
 #
-if [ -n "$BUILDPACK_CLEAR_CACHE" ]; then
-  echo "-----> Clearing cache dir."
-  rm -rf $METEOR_DIR
-fi
+#if [ -n "$BUILDPACK_CLEAR_CACHE" ]; then
+#  echo "-----> Clearing cache dir."
+#  rm -rf $METEOR_DIR
+#fi
 
 #
 # Remove unnecessary stuff to reduce the overall size of the repo to get under the 500MB (compressed) "slug" limit
 #
-echo "-----> Removing node_modules"
-rm -rf "$APP_CHECKOUT_DIR"/node_modules
-echo "-----> Removing .meteor/local"
-rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
-echo "-----> Meteor buildpack done."
+#echo "-----> Removing node_modules"
+#rm -rf "$APP_CHECKOUT_DIR"/node_modules
+#echo "-----> Removing .meteor/local"
+#rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
+#echo "-----> Meteor buildpack done."
 
