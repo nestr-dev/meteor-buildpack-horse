@@ -209,7 +209,36 @@ echo "-----> Building Meteor app with ROOT_URL: $ROOT_URL"
 BUNDLE_DEST=`mktemp -d "$BUILDPACK_DIR/build-XXXX"`
 
 # The actual invocation of `meteor build`!
-METEOR build $BUILD_OPTIONS --server $ROOT_URL $SERVER_ONLY_FLAG --directory $BUNDLE_DEST
+#METEOR build $BUILD_OPTIONS --server $ROOT_URL $SERVER_ONLY_FLAG --directory $BUNDLE_DEST
+
+# Actually, to get a much faster build (below the time limit we kept hitting), we're grabbing the built app from S3 (put there by the dev build process).
+FILE_NAME=web.tar.gz
+BUCKET=perfdog-staging-build
+S3_FILE_PATH="/${BUCKET}/${FILE_NAME}"
+
+CONTENT_TYPE="application/x-compressed-tar"
+DATE_VALUE=$(date -R)
+SIGNATURE_STRING="GET\n\n${CONTENT_TYPE}\n${DATE_VALUE}\n${S3_FILE_PATH}"
+
+#prepare signature hash to be sent in Authorization header
+SIGNATURE_HASH=$(echo -en "${SIGNATURE_STRING}" | openssl sha1 -hmac "${S3_SECRET_KEY}" -binary | base64)
+
+echo "-----> Downloading ${FILE_NAME} from S3..."
+
+# actual curl command to do GET operation on S3
+DOWNLOAD_DEST=$(mktemp -d "$BUILDPACK_DIR/download-XXXX")
+curl --output "${DOWNLOAD_DEST}/${FILE_NAME}" \
+  -H "Host: ${BUCKET}.s3.amazonaws.com" \
+  -H "Date: ${DATE_VALUE}" \
+  -H "Content-Type: ${CONTENT_TYPE}" \
+  -H "Authorization: AWS ${S3_ACCESS_KEY}:${SIGNATURE_HASH}" \
+  https://${BUCKET}.s3.amazonaws.com/${FILE_NAME}
+
+tar -xvf "${DOWNLOAD_DEST}/${FILE_NAME}" --directory "${BUNDLE_DEST}"
+rmdir "${DOWNLOAD_DEST}"
+
+# get back to where we're supposed to be
+cd "$APP_SOURCE_DIR"
 
 echo "-----> Moving built slug to $COMPILE_DIR/app"
 mv $BUNDLE_DEST/bundle "$COMPILE_DIR/app"
@@ -222,6 +251,21 @@ if [ -e "$COMPILE_DIR"/app/programs/server/package.json ]; then
   $METEOR_NPM install --production
   cd "$APP_SOURCE_DIR"
 fi
+
+echo "-----> Maybe removing Puppeteer's Chromium locales to save slug space"
+if [ -e "$APP_SOURCE_DIR"/node_modules/puppeteer/.local-chromium ]; then
+  echo "-----> Actually removing the locales"
+  cd "$APP_SOURCE_DIR"/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales
+  rm *.pak*
+  cd "$APP_SOURCE_DIR"
+
+  # NOTE: if that doesn't work because Puppeteer fails to work correctly, keep the en-US locale:
+  #  - Turn on fancy glob controls in bash (and back off when we're done)
+  #    shopt -s extglob
+  #    rm -v !("en-US.pak"|"en-US.pak.info")
+  #    shopt -u extglob
+fi
+
 
 #
 # Environment
