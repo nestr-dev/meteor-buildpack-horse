@@ -263,3 +263,5 @@ done
 #rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
 #echo "-----> Meteor buildpack done."
 
+# For now, just remove Chromium to see how small the slug gets and how long the build takes.
+rm -rf "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium
