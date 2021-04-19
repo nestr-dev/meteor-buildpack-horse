@@ -235,7 +235,7 @@ curl --output "${DOWNLOAD_DEST}/${FILE_NAME}" \
   https://${BUCKET}.s3.amazonaws.com/${FILE_NAME}
 
 tar -xvf "${DOWNLOAD_DEST}/${FILE_NAME}" --directory "${BUNDLE_DEST}"
-rmdir "${DOWNLOAD_DEST}"
+rm -rf "${DOWNLOAD_DEST}"
 
 # get back to where we're supposed to be
 cd "$APP_SOURCE_DIR"
