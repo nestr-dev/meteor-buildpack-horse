@@ -238,7 +238,7 @@ tar -xvf "${DOWNLOAD_DEST}/${FILE_NAME}" --directory "${BUNDLE_DEST}"
 rm -rf "${DOWNLOAD_DEST}"
 
 # now put the installed node_modules where it would be if we did an actual "meteor build"
-mv "$APP_SOURCE_DIR"/node_modules ${BUNDLE_DEST}/bundle/.
+cp -R "$APP_SOURCE_DIR"/node_modules ${BUNDLE_DEST}/bundle/.
 
 echo "METEOR_DIR=${METEOR_DIR}"
 echo "APP_CHECKOUT_DIR=${APP_CHECKOUT_DIR}"
