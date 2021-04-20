@@ -240,11 +240,18 @@ rm -rf "${DOWNLOAD_DEST}"
 # now put the installed node_modules where it would be if we did an actual "meteor build"
 mv "$APP_SOURCE_DIR"/node_modules ${BUNDLE_DEST}/bundle/.
 
-echo "ls -la APP_SOURCE_DIR:"
-echo `ls -la $APP_SOURCE_DIR`
+echo "METEOR_DIR=${METEOR_DIR}"
+echo "APP_CHECKOUT_DIR=${APP_CHECKOUT_DIR}"
+echo "BUILDPACK_DIR=${BUILDPACK_DIR}"
 
-echo "ls -la BUNDLE_DEST/bundle:"
-echo `ls -la ${BUNDLE_DEST}/bundle`
+echo "APP_SOURCE_DIR=${APP_SOURCE_DIR}"
+echo `ls $APP_SOURCE_DIR`
+
+echo "COMPILE_DIR=${COMPILE_DIR}"
+echo `ls ${COMPILE_DIR}`
+
+echo "BUNDLE_DEST=${BUNDLE_DEST}"
+echo `ls ${BUNDLE_DEST}/bundle`
 
 # get back to where we're supposed to be
 cd "$APP_SOURCE_DIR"
