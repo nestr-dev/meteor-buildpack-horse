@@ -213,7 +213,7 @@ BUNDLE_DEST=`mktemp -d "$BUILDPACK_DIR/build-XXXX"`
 
 # Actually, to get a much faster build (below the time limit we kept hitting), we're grabbing the built app from S3 (put there by the dev build process).
 # But first, try to get Meteor to just install the packages we need.
-METEOR list
+#METEOR list
 
 
 FILE_NAME=web.tar.gz
@@ -274,7 +274,8 @@ rmdir $BUNDLE_DEST
 echo "-----> Installing npm production dependencies on built slug"
 if [ -e "$COMPILE_DIR"/app/programs/server/package.json ]; then
   cd "$COMPILE_DIR"/app/programs/server
-  NODE_DEBUG=child_process $METEOR_NPM install --production
+  #NODE_DEBUG=child_process $METEOR_NPM install --production
+  $METEOR_NPM install --production
   cd "$APP_SOURCE_DIR"
 fi
 
@@ -325,9 +326,9 @@ done
 #
 # Remove unnecessary stuff to reduce the overall size of the repo to get under the 500MB (compressed) "slug" limit
 #
-#echo "-----> Removing node_modules"
-#rm -rf "$APP_CHECKOUT_DIR"/node_modules
-#echo "-----> Removing .meteor/local"
-#rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
-#echo "-----> Meteor buildpack done."
+echo "-----> Removing node_modules"
+rm -rf "$APP_CHECKOUT_DIR"/node_modules
+echo "-----> Removing .meteor/local"
+rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
+echo "-----> Meteor buildpack done."
 
