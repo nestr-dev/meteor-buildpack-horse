@@ -186,9 +186,9 @@ echo "----->    and npm: `$METEOR_NPM --version`"
 
 # If we use npm on root, run npm install.  Don't use `--production` here, as we
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
-if [ -e "$APP_SOURCE_DIR"/package.json ]; then
-  $METEOR_NPM install
-fi
+#if [ -e "$APP_SOURCE_DIR"/package.json ]; then
+#  $METEOR_NPM install
+#fi
 
 # Related to https://github.com/meteor/meteor/issues/2796 and
 # https://github.com/meteor/meteor/issues/2606.  Some packages only build their
@@ -326,8 +326,8 @@ fi
 #
 # Remove unnecessary stuff to reduce the overall size of the repo to get under the 500MB (compressed) "slug" limit
 #
-echo "-----> Removing node_modules"
-rm -rf "$APP_CHECKOUT_DIR"/node_modules
+#echo "-----> Removing node_modules"
+#rm -rf "$APP_CHECKOUT_DIR"/node_modules
 echo "-----> Removing .meteor/local"
 rm -rf "$APP_CHECKOUT_DIR"/.meteor/local
 echo "-----> Meteor buildpack done."
