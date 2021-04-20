@@ -212,6 +212,10 @@ BUNDLE_DEST=`mktemp -d "$BUILDPACK_DIR/build-XXXX"`
 #METEOR build $BUILD_OPTIONS --server $ROOT_URL $SERVER_ONLY_FLAG --directory $BUNDLE_DEST
 
 # Actually, to get a much faster build (below the time limit we kept hitting), we're grabbing the built app from S3 (put there by the dev build process).
+# But first, try to get Meteor to just install the packages we need.
+METEOR list
+
+
 FILE_NAME=web.tar.gz
 BUCKET=perfdog-staging-build
 S3_FILE_PATH="/${BUCKET}/${FILE_NAME}"
