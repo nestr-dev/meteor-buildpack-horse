@@ -126,10 +126,8 @@ if [ "$PERFDOG_ROLE" == "web" ]; then
   #  Turn on fancy glob controls in bash (and back off when we're done)
   cd private
   rm *.coffee
-  shopt -s extglob
   # need to keep this to show a loading page for the website
-  rm -v !("app_loader.html")
-  shopt -u extglob
+  find . -maxdepth 1 -type f -not -name app_loader.html -delete
   cd "$APP_SOURCE_DIR"
   rm -rf programs
   rm -rf server/roles/worker
@@ -337,11 +335,9 @@ fi
 #  rm "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales/*.pak*
 #  
 #  # NOTE: if that doesn't work because Puppeteer fails to work correctly, keep the en-US locale:
-#  #  - Turn on fancy glob controls in bash (and back off when we're done)
-#  #    shopt -s extglob
+
 #  #    cd "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales
-#  #    rm -v !("en-US.pak"|"en-US.pak.info")
-#  #    shopt -u extglob
+#  #    find . -maxdepth 1 -type f -not \(-name "en-US.pak" -or -name "en-US.pak.info" \) -delete
 #fi
 
 #
