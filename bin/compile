@@ -128,7 +128,7 @@ if [ "$PERFDOG_ROLE" == "web" ]; then
   rm *.coffee
   shopt -s extglob
   # need to keep this to show a loading page for the website
-  rm !("app_loader.html")
+  rm -v !("app_loader.html")
   shopt -u extglob
   cd "$APP_SOURCE_DIR"
   rm -rf programs
