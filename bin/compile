@@ -120,6 +120,50 @@ function METEOR {
 # than the "latest" that is installed by install.meteor.com.
 cd "$APP_SOURCE_DIR"
 
+# Remove things we don't need, depending on our role
+if [ "$PERFDOG_ROLE" == "web" ]; then
+  # 'web' role doesn't run workers, Puppeteer, webhooks, or other async functions
+  rm private/*.html
+  rm private/*.coffee
+  rm -rf programs
+  rm -rf server/roles/worker
+
+  cat package.json | \
+      grep -v puppeteer \
+      > newpackage.json
+  mv newpackage.json package.json
+else
+  # 'worker' role doesn't provide a web UI
+  rm -rf client
+  rm -rf programs
+  rm -rf public
+  rm -rf server/roles/web
+
+  cat package.json | \
+      grep -v contentful | \
+      grep -v eslint | \
+      grep -v fabric | \
+      grep -v fullcalendar | \
+      grep -v google-map | \
+      grep -v node-sass | \
+      grep -v react-big-calendar | \
+      grep -v react-froala | \
+      grep -v react-geosuggest | \
+      grep -v react-images | \
+      grep -v react-instantsearch | \
+      grep -v react-motion | \
+      grep -v react-modal | \
+      grep -v react-router | \
+      grep -v react-selectize | \
+      grep -v react-signature | \
+      grep -v react-table | \
+      grep -v react-transition | \
+      grep -v recharts \
+      > newpackage.json
+  mv newpackage.json package.json
+fi
+
+
 #METEOR_VERSION=`METEOR --version`
 METEOR_VERSION="2.2.0"
 
@@ -186,9 +230,9 @@ echo "----->    and npm: `$METEOR_NPM --version`"
 
 # If we use npm on root, run npm install.  Don't use `--production` here, as we
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
-#if [ -e "$APP_SOURCE_DIR"/package.json ]; then
-#  $METEOR_NPM install
-#fi
+if [ -e "$APP_SOURCE_DIR"/package.json ]; then
+  $METEOR_NPM install
+fi
 
 # Related to https://github.com/meteor/meteor/issues/2796 and
 # https://github.com/meteor/meteor/issues/2606.  Some packages only build their
@@ -209,62 +253,65 @@ echo "-----> Building Meteor app with ROOT_URL: $ROOT_URL"
 BUNDLE_DEST=`mktemp -d "$BUILDPACK_DIR/build-XXXX"`
 
 # The actual invocation of `meteor build`!
-#METEOR build $BUILD_OPTIONS --server $ROOT_URL $SERVER_ONLY_FLAG --directory $BUNDLE_DEST
-
-# Actually, to get a much faster build (below the time limit we kept hitting), we're grabbing the built app from S3 (put there by the dev build process).
-# But first, try to get Meteor to just install the packages we need.
-#METEOR list
+METEOR build $BUILD_OPTIONS --server $ROOT_URL $SERVER_ONLY_FLAG --directory $BUNDLE_DEST
 
 
-FILE_NAME=web.tar.gz
-BUCKET=perfdog-staging-build
-S3_FILE_PATH="/${BUCKET}/${FILE_NAME}"
-
-CONTENT_TYPE="application/x-compressed-tar"
-DATE_VALUE=$(date -R)
-SIGNATURE_STRING="GET\n\n${CONTENT_TYPE}\n${DATE_VALUE}\n${S3_FILE_PATH}"
-
+#
+#
+# Keeping this in case we revive the "build on a laptop, upload to S3, download from S3 to Heroku" approach.
+# Not using this for now because it takes so long to build on the laptop that the savings aren't work it as we can build web and worker roles in parallel on
+# Heroku.
+#
+#
+#FILE_NAME=web.tar.gz
+#BUCKET=perfdog-staging-build
+#S3_FILE_PATH="/${BUCKET}/${FILE_NAME}"
+#
+#CONTENT_TYPE="application/x-compressed-tar"
+#DATE_VALUE=$(date -R)
+#SIGNATURE_STRING="GET\n\n${CONTENT_TYPE}\n${DATE_VALUE}\n${S3_FILE_PATH}"
+#
 #prepare signature hash to be sent in Authorization header
-SIGNATURE_HASH=$(echo -en "${SIGNATURE_STRING}" | openssl sha1 -hmac "${S3_SECRET_KEY}" -binary | base64)
-
-echo "-----> Downloading ${FILE_NAME} from S3..."
-
+#SIGNATURE_HASH=$(echo -en "${SIGNATURE_STRING}" | openssl sha1 -hmac "${S3_SECRET_KEY}" -binary | base64)
+#
+#echo "-----> Downloading ${FILE_NAME} from S3..."
+#
 # actual curl command to do GET operation on S3
-DOWNLOAD_DEST=$(mktemp -d "$BUILDPACK_DIR/download-XXXX")
-curl --output "${DOWNLOAD_DEST}/${FILE_NAME}" \
-  -H "Host: ${BUCKET}.s3.amazonaws.com" \
-  -H "Date: ${DATE_VALUE}" \
-  -H "Content-Type: ${CONTENT_TYPE}" \
-  -H "Authorization: AWS ${S3_ACCESS_KEY}:${SIGNATURE_HASH}" \
-  https://${BUCKET}.s3.amazonaws.com/${FILE_NAME}
-
-tar -xvf "${DOWNLOAD_DEST}/${FILE_NAME}" --directory "${BUNDLE_DEST}"
-rm -rf "${DOWNLOAD_DEST}"
-
+#DOWNLOAD_DEST=$(mktemp -d "$BUILDPACK_DIR/download-XXXX")
+#curl --output "${DOWNLOAD_DEST}/${FILE_NAME}" \
+#  -H "Host: ${BUCKET}.s3.amazonaws.com" \
+#  -H "Date: ${DATE_VALUE}" \
+#  -H "Content-Type: ${CONTENT_TYPE}" \
+#  -H "Authorization: AWS ${S3_ACCESS_KEY}:${SIGNATURE_HASH}" \
+#  https://${BUCKET}.s3.amazonaws.com/${FILE_NAME}
+#
+#tar -xvf "${DOWNLOAD_DEST}/${FILE_NAME}" --directory "${BUNDLE_DEST}"
+#rm -rf "${DOWNLOAD_DEST}"
+#
 # now put the installed node_modules where it would be if we did an actual "meteor build"
 #cp -R "$APP_SOURCE_DIR"/node_modules ${BUNDLE_DEST}/bundle/.
-
+#
 # also put the Meteor packages where they need to go
 # TODO: if this actually get us past the "npm install --production" later, we'll clean this up to only put browser packages in the web.browser directory and
 #       server packages in the server directory.
 #cp -R "$METEOR_DIR"/.meteor/packages ${BUNDLE_DEST}/bundle/programs/web.browser/.
 #cp -R "$METEOR_DIR"/.meteor/packages ${BUNDLE_DEST}/bundle/programs/server/.
-
-echo "METEOR_DIR=${METEOR_DIR}"
-echo "APP_CHECKOUT_DIR=${APP_CHECKOUT_DIR}"
-echo "BUILDPACK_DIR=${BUILDPACK_DIR}"
-
-echo "APP_SOURCE_DIR=${APP_SOURCE_DIR}"
-echo `ls $APP_SOURCE_DIR`
-
-echo "COMPILE_DIR=${COMPILE_DIR}"
-echo `ls ${COMPILE_DIR}`
-
-echo "BUNDLE_DEST=${BUNDLE_DEST}"
-echo `ls ${BUNDLE_DEST}/bundle`
-
+#
+#echo "METEOR_DIR=${METEOR_DIR}"
+#echo "APP_CHECKOUT_DIR=${APP_CHECKOUT_DIR}"
+#echo "BUILDPACK_DIR=${BUILDPACK_DIR}"
+#
+#echo "APP_SOURCE_DIR=${APP_SOURCE_DIR}"
+#echo `ls $APP_SOURCE_DIR`
+#
+#echo "COMPILE_DIR=${COMPILE_DIR}"
+#echo `ls ${COMPILE_DIR}`
+#
+#echo "BUNDLE_DEST=${BUNDLE_DEST}"
+#echo `ls ${BUNDLE_DEST}/bundle`
+#
 # get back to where we're supposed to be
-cd "$APP_SOURCE_DIR"
+#cd "$APP_SOURCE_DIR"
 
 echo "-----> Moving built slug to $COMPILE_DIR/app"
 mv $BUNDLE_DEST/bundle "$COMPILE_DIR/app"
@@ -279,18 +326,18 @@ if [ -e "$COMPILE_DIR"/app/programs/server/package.json ]; then
   cd "$APP_SOURCE_DIR"
 fi
 
-echo "-----> Maybe removing Puppeteer's Chromium locales to save slug space"
-if [ -e "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium ]; then
-  echo "-----> Actually removing the locales"
-  rm "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales/*.pak*
-  
-  # NOTE: if that doesn't work because Puppeteer fails to work correctly, keep the en-US locale:
-  #  - Turn on fancy glob controls in bash (and back off when we're done)
-  #    shopt -s extglob
-  #    cd "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales
-  #    rm -v !("en-US.pak"|"en-US.pak.info")
-  #    shopt -u extglob
-fi
+#echo "-----> Maybe removing Puppeteer's Chromium locales to save slug space"
+#if [ -e "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium ]; then
+#  echo "-----> Actually removing the locales"
+#  rm "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales/*.pak*
+#  
+#  # NOTE: if that doesn't work because Puppeteer fails to work correctly, keep the en-US locale:
+#  #  - Turn on fancy glob controls in bash (and back off when we're done)
+#  #    shopt -s extglob
+#  #    cd "$COMPILE_DIR"/app/programs/server/npm/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/locales
+#  #    rm -v !("en-US.pak"|"en-US.pak.info")
+#  #    shopt -u extglob
+#fi
 
 #
 # Environment
