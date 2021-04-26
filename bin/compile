@@ -106,10 +106,9 @@ fi
 # Function to execute meteor with proper HOME.
 function METEOR {
   ARGS=$@
-  HOME="$METEOR_DIR" "$METEOR_DIR/.meteor/meteor" $ARGS
+  HOME="$METEOR_DIR" TOOL_NODE_FLAGS="--max-old-space-size=4096" "$METEOR_DIR/.meteor/meteor" $ARGS
+  #HOME="$METEOR_DIR" "$METEOR_DIR/.meteor/meteor" $ARGS
 }
-# Shouldn't need to do this with Node 12+ because it should use available memory instead of being capped at 1.5GB RAM like previous versions.
-#  HOME="$METEOR_DIR" TOOL_NODE_FLAGS="--max-old-space-size=4096" "$METEOR_DIR/.meteor/meteor" $ARGS
 
 #
 # Build the meteor app!
