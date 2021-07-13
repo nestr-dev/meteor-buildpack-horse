@@ -95,13 +95,17 @@ fi
 # Install meteor
 #
 
+# Force this version to avoid issues with Meteor upgrades being ready before we are or build timeouts due to
+# trying to build against both the latest Meteor version and the one in .meteor/release.
+METEOR_VERSION="2.2.1"
+
 # Install the latest meteor, and rely on meteor to upgrade/downgrade itself to
 # the .meteor/release target.
 if [ -e "$METEOR_DIR/.meteor/meteor" ]; then
   echo "-----> Existing meteor installation found, using it."
 else
   echo "-----> Installing meteor"
-  curl -sS "https://install.meteor.com/" | HOME="$METEOR_DIR" /bin/sh
+  curl -sS "https://install.meteor.com/?release=$METEOR_VERSION" | HOME="$METEOR_DIR" /bin/sh
 fi
 # Function to execute meteor with proper HOME.
 function METEOR {
@@ -165,9 +169,6 @@ else
   mv newpackage.json package.json
 fi
 
-
-#METEOR_VERSION=`METEOR --version`
-METEOR_VERSION="2.3.1"
 
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
