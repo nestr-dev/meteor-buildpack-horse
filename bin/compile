@@ -167,7 +167,7 @@ fi
 
 
 #METEOR_VERSION=`METEOR --version`
-METEOR_VERSION="2.2.1"
+METEOR_VERSION="2.3.1"
 
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
