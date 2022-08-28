@@ -97,7 +97,7 @@ fi
 
 # Force this version to avoid issues with Meteor upgrades being ready before we are or build timeouts due to
 # trying to build against both the latest Meteor version and the one in .meteor/release.
-METEOR_VERSION="2.2.1"
+METEOR_VERSION="2.2.4"
 
 # Install the latest meteor, and rely on meteor to upgrade/downgrade itself to
 # the .meteor/release target.
