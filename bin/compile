@@ -178,8 +178,8 @@ echo "sed start ------"
 # hack to completely remove building the web.browser.legacy 'web architecture', which takes 10+ minutes off the deployment time
 sed -e 's/, "web.browser.legacy"//' -e 's/"web.browser.legacy",//' "$METEOR_TOOLS_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME" > "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME"
 echo "sed stops ------"
-cat "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME"
-echo "end of changed file ------"
+#cat "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME"
+#echo "end of changed file ------"
 echo "moving file from $METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME to $METEOR_TOOLS_DIR/."
 mv "$METEOR_DIR/$METEOR_PROJECT_CONTEXT_FILE_NAME" "$METEOR_TOOLS_DIR/."
 
@@ -236,6 +236,9 @@ export PATH="$HOME/.yarn/bin:$PATH"
 echo "-----> Using node: `$NODE --version`"
 echo "----->    and npm: `$METEOR_NPM --version`"
 echo "----->    and yarn: `yarn --version`"
+
+# Debugging build error
+cat "/tmp/build/package.json"
 
 # If we use npm on root, run npm install.  Don't use `--production` here, as we
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
