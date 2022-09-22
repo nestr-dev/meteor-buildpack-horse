@@ -123,53 +123,6 @@ function METEOR {
 # than the "latest" that is installed by install.meteor.com.
 cd "$APP_SOURCE_DIR"
 
-# Remove things we don't need, depending on our role
-if [ "$PERFDOG_ROLE" == "web" ]; then
-  # 'web' role doesn't run workers, Puppeteer, webhooks, or other async functions
-  #  Turn on fancy glob controls in bash (and back off when we're done)
-  cd private
-  rm *.coffee
-  # need to keep this to show a loading page for the website
-  find . -maxdepth 1 -type f -not -name app_loader.html -delete
-  cd "$APP_SOURCE_DIR"
-  rm -rf programs
-  rm -rf server/roles/worker
-
-  cat package.json | \
-      grep -v puppeteer \
-      > newpackage.json
-  mv newpackage.json package.json
-else
-  # 'worker' role doesn't provide a web UI
-  rm -rf client
-  rm -rf programs
-  rm -rf public
-  rm -rf server/roles/web
-
-  cat package.json | \
-      grep -v eslint | \
-      grep -v fabric | \
-      grep -v fullcalendar | \
-      grep -v google-map | \
-      grep -v node-sass | \
-      grep -v react-big-calendar | \
-      grep -v react-froala | \
-      grep -v react-geosuggest | \
-      grep -v react-images | \
-      grep -v react-instantsearch | \
-      grep -v react-motion | \
-      grep -v react-modal | \
-      grep -v react-router | \
-      grep -v react-selectize | \
-      grep -v react-signature | \
-      grep -v react-table | \
-      grep -v react-transition | \
-      grep -v recharts \
-      > newpackage.json
-  mv newpackage.json package.json
-fi
-
-
 echo "-----> Target Meteor version: $METEOR_VERSION"
 METEOR_TOOLS_DIR="$METEOR_DIR/.meteor/packages/meteor-tool/$METEOR_VERSION/mt-os.linux.x86_64/tools"
 METEOR_PROJECT_CONTEXT_FILE_NAME="project-context.js"
@@ -236,9 +189,6 @@ export PATH="$HOME/.yarn/bin:$PATH"
 echo "-----> Using node: `$NODE --version`"
 echo "----->    and npm: `$METEOR_NPM --version`"
 echo "----->    and yarn: `yarn --version`"
-
-# Debugging build error
-cat "/tmp/build/package.json"
 
 # If we use npm on root, run npm install.  Don't use `--production` here, as we
 # may need devDependencies (e.g. webpack) in order to build the meteor app.
