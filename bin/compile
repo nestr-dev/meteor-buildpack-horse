@@ -285,8 +285,9 @@ echo "-----> Installing npm production dependencies on built slug"
 if [ -e "$COMPILE_DIR"/app/programs/server/package.json ]; then
   cd "$COMPILE_DIR"/app/programs/server
   #NODE_DEBUG=child_process $METEOR_NPM install --production
-  # $METEOR_NPM install --production
-  yarn install --production
+  # Meteor generates a npm-shrinkwrap.json file, so here we use NPM instead of yarn
+  # yarn install --production
+  $METEOR_NPM install --production
   cd "$APP_SOURCE_DIR"
 fi
 
